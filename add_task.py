@@ -2,41 +2,37 @@
 class FlatIteratorEnhanced:
 
     def __init__(self, multi_list):
-        """Определяет атрибут для хранения списка списков"""
         self.multi_list = multi_list
 
     def __iter__(self):
-        """Определяет атрибуты для итерации по списку"""
-        self.iterators_queue = []  # определяем вложенный список для добавления элементов очереди итераторов
-        self.current_iterator = iter(self.multi_list)  # определяем итератор для списка
+        self.iterators_queue = []
+        self.current_iterator = iter(self.multi_list)
         return self
 
     def __next__(self):
-        """Определяет и возвращает следущий элемент списка списков"""
         while True:
             try:
-                self.current_element = next(self.current_iterator)   # получаем следующий элемент списка
-            except StopIteration:  # или получаем исключение, ели следующего элемента нет
-                if not self.iterators_queue:  # если не осталось элементов в очереди, возвращаем исключение
+                self.current_element = next(self.current_iterator)
+            except StopIteration:
+                if not self.iterators_queue:
                     raise StopIteration
                 else:
-                    self.current_iterator = self.iterators_queue.pop()  # или получаем следующий элемент очереди
+                    self.current_iterator = self.iterators_queue.pop()
                     continue
-            if isinstance(self.current_element, list):  # проверяем тип следующего элемента (список или нет)
-                self.iterators_queue.append(self.current_iterator)  # если список, то добавляем в очередь
-                self.current_iterator = iter(self.current_element)  # и смещаем указатель текущего итератора
-            else:  # если элемент не список, то возвращаем этот элемент
+            if isinstance(self.current_element, list):
+                self.iterators_queue.append(self.current_iterator)
+                self.current_iterator = iter(self.current_element)
+            else:
                 return self.current_element
 
 
 def flat_generator_enhanced(multi_list):
-    """Генератор позволяет  возвращать эелементы из списка списков с любым уровнем вложености"""
     for elem in multi_list:
-        if isinstance(elem, list):  # проверяем тип следующего элемента (список или нет)
-            for sub_elem in flat_generator_enhanced(elem):  # если список, то снова рекурсивно вызываем этот же генратор
+        if isinstance(elem, list):
+            for sub_elem in flat_generator_enhanced(elem):
                 yield sub_elem
         else:
-            yield elem  # если элемент не список, то возвращаем этот элемент
+            yield elem
 
 
 if __name__ == '__main__':
